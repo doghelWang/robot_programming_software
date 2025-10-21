@@ -1,0 +1,1111 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>机器人编程软件原型</title>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/ant-design-vue@1.7.8/dist/antd.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/ant-design-vue@1.7.8/dist/antd.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background-color: #f0f2f5;
+            color: #333;
+            overflow: hidden;
+        }
+        
+        .app-container {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            width: 100vw;
+        }
+        
+        /* 顶部导航栏 */
+        .header {
+            background-color: #1890ff;
+            color: white;
+            padding: 0 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            flex-shrink: 0;
+        }
+        
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 60px;
+        }
+        
+        .logo {
+            font-size: 20px;
+            font-weight: bold;
+        }
+        
+        .toolbar {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .toolbar-btn {
+            background-color: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        
+        .toolbar-btn:hover {
+            background-color: rgba(255,255,255,0.3);
+        }
+        
+        /* 主内容区域 */
+        .main-content {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+        
+        /* 左侧面板 */
+        .left-panel {
+            width: 300px;
+            background-color: white;
+            border-right: 1px solid #e8e8e8;
+            display: flex;
+            flex-direction: column;
+            flex-shrink: 0;
+        }
+        
+        .panel-tabs {
+            display: flex;
+            background-color: #f5f5f5;
+            border-bottom: 1px solid #e8e8e8;
+        }
+        
+        .tab-btn {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            background: none;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.3s;
+            border-bottom: 2px solid transparent;
+        }
+        
+        .tab-btn.active {
+            background-color: white;
+            border-bottom-color: #1890ff;
+            color: #1890ff;
+        }
+        
+        .panel-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 10px;
+        }
+        
+        /* 变量区域 */
+        .variable-section {
+            margin-bottom: 15px;
+        }
+        
+        .section-title {
+            font-size: 14px;
+            font-weight: bold;
+            color: #666;
+            margin-bottom: 8px;
+            padding-left: 5px;
+        }
+        
+        .variable-item {
+            background-color: #f0f8ff;
+            border: 1px solid #bae7ff;
+            border-radius: 4px;
+            padding: 8px;
+            margin-bottom: 5px;
+            cursor: move;
+            transition: all 0.3s;
+        }
+        
+        .variable-item:hover {
+            background-color: #e6f7ff;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .variable-name {
+            font-weight: bold;
+            color: #1890ff;
+        }
+        
+        .variable-info {
+            font-size: 12px;
+            color: #666;
+            margin-top: 2px;
+        }
+        
+        .variable-value {
+            font-family: monospace;
+            font-size: 12px;
+            background-color: #fff;
+            padding: 2px 5px;
+            border-radius: 2px;
+            margin-top: 2px;
+        }
+        
+        /* 函数模块区域 */
+        .function-category {
+            margin-bottom: 15px;
+        }
+        
+        .function-item {
+            background-color: #f6ffed;
+            border: 1px solid #b7eb8f;
+            border-radius: 4px;
+            padding: 8px;
+            margin-bottom: 5px;
+            cursor: move;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .function-item.logic {
+            background-color: #fff7e6;
+            border-color: #ffd591;
+        }
+        
+        .function-item.motor {
+            background-color: #fff2e8;
+            border-color: #ffbb96;
+        }
+        
+        .function-item.sensor {
+            background-color: #f0f5ff;
+            border-color: #adc6ff;
+        }
+        
+        .function-item:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .function-icon {
+            width: 24px;
+            height: 24px;
+            background-color: rgba(255,255,255,0.6);
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+        
+        .function-name {
+            font-weight: bold;
+        }
+        
+        /* 编程区域 */
+        .programming-area {
+            flex: 1;
+            background-color: #fafafa;
+            position: relative;
+            overflow: auto;
+        }
+        
+        .canvas-grid {
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(rgba(0,0,0,0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0,0,0,0.05) 1px, transparent 1px);
+            background-size: 20px 20px;
+            position: relative;
+            padding: 20px;
+        }
+        
+        .program-block {
+            position: absolute;
+            background-color: white;
+            border: 2px solid #1890ff;
+            border-radius: 8px;
+            padding: 15px;
+            min-width: 200px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+            cursor: move;
+            transition: all 0.3s;
+        }
+        
+        .program-block:hover {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+        
+        .program-block.selected {
+            border-color: #52c41a;
+            box-shadow: 0 0 0 2px rgba(82, 196, 26, 0.2);
+        }
+        
+        .block-header {
+            font-weight: bold;
+            color: #1890ff;
+            margin-bottom: 10px;
+            padding-bottom: 5px;
+            border-bottom: 1px solid #e8e8e8;
+        }
+        
+        .block-params {
+            margin-top: 10px;
+        }
+        
+        .param-item {
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .param-label {
+            font-size: 12px;
+            color: #666;
+            min-width: 60px;
+        }
+        
+        .param-input {
+            flex: 1;
+            padding: 4px 8px;
+            border: 1px solid #d9d9d9;
+            border-radius: 4px;
+            font-size: 12px;
+        }
+        
+        .param-input.drag-over {
+            border-color: #1890ff;
+            background-color: #e6f7ff;
+        }
+        
+        .connection-point {
+            position: absolute;
+            width: 12px;
+            height: 12px;
+            background-color: #1890ff;
+            border-radius: 50%;
+            cursor: crosshair;
+            border: 2px solid white;
+        }
+        
+        .connection-point.input {
+            top: 50%;
+            left: -6px;
+            transform: translateY(-50%);
+        }
+        
+        .connection-point.output {
+            top: 50%;
+            right: -6px;
+            transform: translateY(-50%);
+        }
+        
+        .connection-line {
+            position: absolute;
+            background-color: #1890ff;
+            height: 2px;
+            transform-origin: left center;
+            pointer-events: none;
+        }
+        
+        /* 创建变量按钮 */
+        .create-var-btn {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 10px;
+            background-color: #52c41a;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        
+        .create-var-btn:hover {
+            background-color: #73d13d;
+        }
+        
+        /* 底部状态栏 */
+        .footer {
+            background-color: #fafafa;
+            border-top: 1px solid #e8e8e8;
+            padding: 8px 20px;
+            font-size: 12px;
+            color: #666;
+            flex-shrink: 0;
+        }
+        
+        /* 拖拽提示 */
+        .drag-ghost {
+            opacity: 0.5;
+            background-color: rgba(24, 144, 255, 0.2);
+            border: 2px dashed #1890ff;
+            border-radius: 8px;
+        }
+        
+        .drop-indicator {
+            background-color: #52c41a;
+            position: absolute;
+            z-index: 10;
+        }
+        
+        /* 模态框样式 */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+        
+        .modal-content {
+            background-color: white;
+            border-radius: 8px;
+            padding: 24px;
+            width: 400px;
+            max-width: 90vw;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+        }
+        
+        .modal-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            color: #333;
+        }
+        
+        .form-group {
+            margin-bottom: 16px;
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            color: #666;
+            font-size: 14px;
+        }
+        
+        .form-input,
+        .form-select {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #d9d9d9;
+            border-radius: 4px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+        
+        .form-input:focus,
+        .form-select:focus {
+            outline: none;
+            border-color: #1890ff;
+        }
+        
+        .form-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 24px;
+        }
+        
+        .btn {
+            padding: 8px 16px;
+            border-radius: 4px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 1px solid transparent;
+        }
+        
+        .btn-primary {
+            background-color: #1890ff;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background-color: #40a9ff;
+        }
+        
+        .btn-default {
+            background-color: white;
+            border-color: #d9d9d9;
+            color: #333;
+        }
+        
+        .btn-default:hover {
+            border-color: #1890ff;
+            color: #1890ff;
+        }
+        
+        /* 提示信息 */
+        .tooltip {
+            position: absolute;
+            background-color: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            pointer-events: none;
+            white-space: nowrap;
+            z-index: 100;
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <!-- 顶部导航栏 -->
+        <div class="header">
+            <div class="header-content">
+                <div class="logo">机器人编程软件</div>
+                <div class="toolbar">
+                    <button class="toolbar-btn">加载配置</button>
+                    <button class="toolbar-btn">保存程序</button>
+                    <button class="toolbar-btn">加载程序</button>
+                    <button class="toolbar-btn">导出程序</button>
+                    <button class="toolbar-btn">连接设备</button>
+                    <button class="toolbar-btn">执行程序</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 主内容区域 -->
+        <div class="main-content">
+            <!-- 左侧面板 -->
+            <div class="left-panel">
+                <div class="panel-tabs">
+                    <button class="tab-btn" :class="{active: activeTab === 'variables'}" @click="activeTab = 'variables'">变量区</button>
+                    <button class="tab-btn" :class="{active: activeTab === 'functions'}" @click="activeTab = 'functions'">函数模块</button>
+                </div>
+                
+                <div class="panel-content">
+                    <!-- 变量区 -->
+                    <div v-if="activeTab === 'variables'">
+                        <button class="create-var-btn" @click="showCreateVarModal = true">创建局部变量</button>
+                        
+                        <!-- 只读变量 -->
+                        <div class="variable-section">
+                            <div class="section-title">只读变量</div>
+                            <div 
+                                v-for="var in readOnlyVariables" 
+                                :key="var.name"
+                                class="variable-item"
+                                draggable="true"
+                                @dragstart="handleDragStart($event, 'variable', var)"
+                                @mouseenter="showTooltip($event, var.description)"
+                                @mouseleave="hideTooltip"
+                            >
+                                <div class="variable-name">{{ var.name }}</div>
+                                <div class="variable-info">{{ var.type }} | {{ var.unit || '-' }}</div>
+                                <div class="variable-value">{{ var.value }}</div>
+                            </div>
+                        </div>
+                        
+                        <!-- 读写变量 -->
+                        <div class="variable-section">
+                            <div class="section-title">读写变量</div>
+                            <div 
+                                v-for="var in readWriteVariables" 
+                                :key="var.name"
+                                class="variable-item"
+                                draggable="true"
+                                @dragstart="handleDragStart($event, 'variable', var)"
+                                @mouseenter="showTooltip($event, var.description)"
+                                @mouseleave="hideTooltip"
+                            >
+                                <div class="variable-name">{{ var.name }}</div>
+                                <div class="variable-info">{{ var.type }} | {{ var.unit || '-' }}</div>
+                                <div class="variable-value">{{ var.value }}</div>
+                            </div>
+                        </div>
+                        
+                        <!-- 局部变量 -->
+                        <div class="variable-section">
+                            <div class="section-title">局部变量</div>
+                            <div 
+                                v-for="var in localVariables" 
+                                :key="var.name"
+                                class="variable-item"
+                                draggable="true"
+                                @dragstart="handleDragStart($event, 'variable', var)"
+                                @mouseenter="showTooltip($event, var.description)"
+                                @mouseleave="hideTooltip"
+                            >
+                                <div class="variable-name">{{ var.name }}</div>
+                                <div class="variable-info">{{ var.type }}</div>
+                                <div class="variable-value">{{ var.value }}</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 函数模块区 -->
+                    <div v-if="activeTab === 'functions'">
+                        <!-- 逻辑块 -->
+                        <div class="function-category">
+                            <div class="section-title">逻辑块</div>
+                            <div 
+                                v-for="func in logicFunctions" 
+                                :key="func.name"
+                                class="function-item logic"
+                                draggable="true"
+                                @dragstart="handleDragStart($event, 'function', func)"
+                                @mouseenter="showTooltip($event, func.description)"
+                                @mouseleave="hideTooltip"
+                            >
+                                <div class="function-icon">L</div>
+                                <div>
+                                    <div class="function-name">{{ func.name }}</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- 电机控制 -->
+                        <div class="function-category">
+                            <div class="section-title">电机控制</div>
+                            <div 
+                                v-for="func in motorFunctions" 
+                                :key="func.name"
+                                class="function-item motor"
+                                draggable="true"
+                                @dragstart="handleDragStart($event, 'function', func)"
+                                @mouseenter="showTooltip($event, func.description)"
+                                @mouseleave="hideTooltip"
+                            >
+                                <div class="function-icon">M</div>
+                                <div>
+                                    <div class="function-name">{{ func.name }}</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- 传感器 -->
+                        <div class="function-category">
+                            <div class="section-title">传感器</div>
+                            <div 
+                                v-for="func in sensorFunctions" 
+                                :key="func.name"
+                                class="function-item sensor"
+                                draggable="true"
+                                @dragstart="handleDragStart($event, 'function', func)"
+                                @mouseenter="showTooltip($event, func.description)"
+                                @mouseleave="hideTooltip"
+                            >
+                                <div class="function-icon">S</div>
+                                <div>
+                                    <div class="function-name">{{ func.name }}</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 编程区域 -->
+            <div class="programming-area">
+                <div 
+                    class="canvas-grid" 
+                    @dragover.prevent
+                    @drop="handleDrop"
+                    @mousemove="handleMouseMove"
+                >
+                    <!-- 程序块 -->
+                    <div 
+                        v-for="(block, index) in programBlocks" 
+                        :key="index"
+                        class="program-block" 
+                        :class="{ selected: selectedBlockIndex === index }"
+                        :style="{
+                            left: block.x + 'px',
+                            top: block.y + 'px'
+                        }"
+                        @mousedown="handleBlockMouseDown($event, index)"
+                        @click.stop
+                    >
+                        <div class="block-header">{{ block.name }}</div>
+                        
+                        <!-- 参数输入区域 -->
+                        <div class="block-params" v-if="block.params && block.params.length > 0">
+                            <div 
+                                v-for="param in block.params" 
+                                :key="param.name"
+                                class="param-item"
+                            >
+                                <div class="param-label">{{ param.name }}:</div>
+                                <input 
+                                    type="text" 
+                                    class="param-input" 
+                                    :class="{ 'drag-over': draggedOverParam === param.name }"
+                                    v-model="param.value"
+                                    @dragover.prevent="handleParamDragOver($event, param.name)"
+                                    @dragleave="handleParamDragLeave"
+                                    @drop="handleParamDrop($event, index, param.name)"
+                                >
+                            </div>
+                        </div>
+                        
+                        <!-- 连接点 -->
+                        <div class="connection-point input"></div>
+                        <div class="connection-point output"></div>
+                    </div>
+                    
+                    <!-- 连接线条 -->
+                    <div 
+                        v-for="(connection, index) in connections" 
+                        :key="index"
+                        class="connection-line" 
+                        :style="connection.style"
+                    ></div>
+                    
+                    <!-- 拖拽预览 -->
+                    <div 
+                        v-if="dragPreviewVisible"
+                        class="program-block drag-ghost"
+                        :style="{
+                            left: dragPreviewX + 'px',
+                            top: dragPreviewY + 'px'
+                        }"
+                    >
+                        <div class="block-header">{{ currentDragItem.name }}</div>
+                        
+                        <!-- 预览参数 -->
+                        <div class="block-params" v-if="currentDragItem.params && currentDragItem.params.length > 0">
+                            <div 
+                                v-for="param in currentDragItem.params" 
+                                :key="param.name"
+                                class="param-item"
+                            >
+                                <div class="param-label">{{ param.name }}:</div>
+                                <input type="text" class="param-input" placeholder="输入或拖拽变量">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 底部状态栏 -->
+        <div class="footer">
+            <span>就绪</span>
+            <span style="margin-left: 20px;">提示: 从左侧拖拽变量或函数模块到编程区域开始编程</span>
+        </div>
+        
+        <!-- 创建变量模态框 -->
+        <div v-if="showCreateVarModal" class="modal-overlay" @click.self="showCreateVarModal = false">
+            <div class="modal-content">
+                <div class="modal-title">创建局部变量</div>
+                
+                <div class="form-group">
+                    <label class="form-label">变量名称</label>
+                    <input type="text" class="form-input" v-model="newVar.name" placeholder="请输入变量名称">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">变量类型</label>
+                    <select class="form-select" v-model="newVar.type">
+                        <option value="int">整数</option>
+                        <option value="float">浮点数</option>
+                        <option value="bool">布尔值</option>
+                        <option value="string">字符串</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">初始值</label>
+                    <input type="text" class="form-input" v-model="newVar.value" placeholder="请输入初始值">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">描述（可选）</label>
+                    <input type="text" class="form-input" v-model="newVar.description" placeholder="请输入变量描述">
+                </div>
+                
+                <div class="form-actions">
+                    <button class="btn btn-default" @click="showCreateVarModal = false">取消</button>
+                    <button class="btn btn-primary" @click="createVariable">确定</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 提示框 -->
+        <div 
+            v-if="tooltipVisible"
+            class="tooltip"
+            :style="{
+                left: tooltipX + 'px',
+                top: tooltipY + 'px'
+            }"
+        >
+            {{ tooltipText }}
+        </div>
+    </div>
+    
+    <script>
+        new Vue({
+            el: '#app',
+            data: {
+                // 界面状态
+                activeTab: 'variables',
+                selectedBlockIndex: -1,
+                
+                // 拖拽相关
+                isDraggingBlock: false,
+                dragStartX: 0,
+                dragStartY: 0,
+                blockStartX: 0,
+                blockStartY: 0,
+                currentDraggingBlockIndex: -1,
+                
+                // 拖拽预览
+                dragPreviewVisible: false,
+                dragPreviewX: 0,
+                dragPreviewY: 0,
+                currentDragItem: {},
+                dragItemType: '',
+                
+                // 参数拖拽
+                draggedOverParam: '',
+                
+                // 提示框
+                tooltipVisible: false,
+                tooltipText: '',
+                tooltipX: 0,
+                tooltipY: 0,
+                
+                // 模态框
+                showCreateVarModal: false,
+                newVar: {
+                    name: '',
+                    type: 'int',
+                    value: '',
+                    description: ''
+                },
+                
+                // 变量数据
+                readOnlyVariables: [
+                    { name: 'battery_voltage', type: 'float', value: '12.5', unit: 'V', description: '电池电压' },
+                    { name: 'current_position_x', type: 'float', value: '0.0', unit: 'm', description: 'X轴位置' },
+                    { name: 'current_position_y', type: 'float', value: '0.0', unit: 'm', description: 'Y轴位置' },
+                    { name: 'current_angle', type: 'float', value: '0.0', unit: 'deg', description: '当前角度' },
+                    { name: 'laser_distance', type: 'float', value: '1.2', unit: 'm', description: '激光测距值' },
+                    { name: 'lift_current_height', type: 'float', value: '0.5', unit: 'm', description: '举升机构当前高度' }
+                ],
+                
+                readWriteVariables: [
+                    { name: 'max_speed', type: 'float', value: '0.5', unit: 'm/s', description: '最大速度' },
+                    { name: 'acceleration', type: 'float', value: '0.2', unit: 'm/s²', description: '加速度' },
+                    { name: 'deceleration', type: 'float', value: '0.2', unit: 'm/s²', description: '减速度' },
+                    { name: 'lift_target_height', type: 'float', value: '0.5', unit: 'm', description: '举升机构目标高度' }
+                ],
+                
+                localVariables: [
+                    { name: 'counter', type: 'int', value: '0', description: '计数器' },
+                    { name: 'is_finished', type: 'bool', value: 'false', description: '任务完成标志' }
+                ],
+                
+                // 函数模块数据
+                logicFunctions: [
+                    {
+                        name: '条件判断',
+                        type: 'logic',
+                        description: '根据条件执行不同的代码块',
+                        params: [
+                            { name: '条件', type: 'bool', value: '' }
+                        ]
+                    },
+                    {
+                        name: '循环',
+                        type: 'logic',
+                        description: '重复执行代码块指定次数',
+                        params: [
+                            { name: '次数', type: 'int', value: '1' }
+                        ]
+                    },
+                    {
+                        name: '等待',
+                        type: 'logic',
+                        description: '等待指定时间',
+                        params: [
+                            { name: '时间', type: 'float', value: '1.0', unit: 's' }
+                        ]
+                    }
+                ],
+                
+                motorFunctions: [
+                    {
+                        name: '电机前进',
+                        type: 'motor',
+                        description: '控制电机前进指定距离',
+                        params: [
+                            { name: '距离', type: 'float', value: '1.0', unit: 'm' },
+                            { name: '速度', type: 'float', value: '0.3', unit: 'm/s' }
+                        ]
+                    },
+                    {
+                        name: '电机后退',
+                        type: 'motor',
+                        description: '控制电机后退指定距离',
+                        params: [
+                            { name: '距离', type: 'float', value: '1.0', unit: 'm' },
+                            { name: '速度', type: 'float', value: '0.3', unit: 'm/s' }
+                        ]
+                    },
+                    {
+                        name: '电机旋转',
+                        type: 'motor',
+                        description: '控制电机旋转指定角度',
+                        params: [
+                            { name: '角度', type: 'float', value: '90.0', unit: 'deg' },
+                            { name: '速度', type: 'float', value: '30.0', unit: 'deg/s' }
+                        ]
+                    },
+                    {
+                        name: '电机停止',
+                        type: 'motor',
+                        description: '停止所有电机',
+                        params: []
+                    }
+                ],
+                
+                sensorFunctions: [
+                    {
+                        name: '读取激光数据',
+                        type: 'sensor',
+                        description: '读取激光传感器数据并存储到变量',
+                        params: [
+                            { name: '目标变量', type: 'variable', value: '' }
+                        ]
+                    },
+                    {
+                        name: '读取举升高度',
+                        type: 'sensor',
+                        description: '读取举升机构当前高度并存储到变量',
+                        params: [
+                            { name: '目标变量', type: 'variable', value: '' }
+                        ]
+                    },
+                    {
+                        name: '检查障碍物',
+                        type: 'sensor',
+                        description: '检查前方是否有障碍物',
+                        params: [
+                            { name: '检测距离', type: 'float', value: '0.5', unit: 'm' }
+                        ]
+                    }
+                ],
+                
+                // 编程区域数据
+                programBlocks: [],
+                connections: []
+            },
+            
+            mounted() {
+                // 添加全局鼠标事件监听
+                document.addEventListener('mousemove', this.handleGlobalMouseMove);
+                document.addEventListener('mouseup', this.handleGlobalMouseUp);
+            },
+            
+            beforeDestroy() {
+                // 移除全局事件监听
+                document.removeEventListener('mousemove', this.handleGlobalMouseMove);
+                document.removeEventListener('mouseup', this.handleGlobalMouseUp);
+            },
+            
+            methods: {
+                // 拖拽开始处理
+                handleDragStart(event, itemType, item) {
+                    this.dragItemType = itemType;
+                    this.currentDragItem = JSON.parse(JSON.stringify(item)); // 深拷贝
+                    event.dataTransfer.effectAllowed = 'copy';
+                    
+                    // 设置拖拽图像
+                    const dragImage = event.target.cloneNode(true);
+                    dragImage.style.position = 'absolute';
+                    dragImage.style.top = '-1000px';
+                    document.body.appendChild(dragImage);
+                    event.dataTransfer.setDragImage(dragImage, 50, 25);
+                    
+                    // 延迟移除克隆元素
+                    setTimeout(() => {
+                        document.body.removeChild(dragImage);
+                    }, 0);
+                    
+                    // 开始显示拖拽预览
+                    this.dragPreviewVisible = true;
+                    this.dragPreviewX = event.clientX - 100;
+                    this.dragPreviewY = event.clientY - 30;
+                },
+                
+                // 鼠标移动处理
+                handleMouseMove(event) {
+                    if (this.dragPreviewVisible) {
+                        const canvasRect = event.target.getBoundingClientRect();
+                        this.dragPreviewX = event.clientX - canvasRect.left - 100;
+                        this.dragPreviewY = event.clientY - canvasRect.top - 30;
+                    }
+                },
+                
+                // 放置处理
+                handleDrop(event) {
+                    event.preventDefault();
+                    
+                    // 隐藏拖拽预览
+                    this.dragPreviewVisible = false;
+                    
+                    // 获取放置位置
+                    const canvasRect = event.target.closest('.canvas-grid').getBoundingClientRect();
+                    const x = event.clientX - canvasRect.left - 100;
+                    const y = event.clientY - canvasRect.top - 30;
+                    
+                    // 创建新的程序块
+                    if (this.dragItemType === 'function') {
+                        const newBlock = {
+                            ...this.currentDragItem,
+                            x: Math.max(0, x),
+                            y: Math.max(0, y)
+                        };
+                        this.programBlocks.push(newBlock);
+                    }
+                },
+                
+                // 程序块鼠标按下
+                handleBlockMouseDown(event, index) {
+                    // 阻止事件冒泡
+                    event.stopPropagation();
+                    
+                    // 设置选中状态
+                    this.selectedBlockIndex = index;
+                    
+                    // 开始拖拽
+                    this.isDraggingBlock = true;
+                    this.currentDraggingBlockIndex = index;
+                    
+                    // 记录初始位置
+                    const block = this.programBlocks[index];
+                    this.dragStartX = event.clientX;
+                    this.dragStartY = event.clientY;
+                    this.blockStartX = block.x;
+                    this.blockStartY = block.y;
+                },
+                
+                // 全局鼠标移动
+                handleGlobalMouseMove(event) {
+                    if (this.isDraggingBlock && this.currentDraggingBlockIndex >= 0) {
+                        const deltaX = event.clientX - this.dragStartX;
+                        const deltaY = event.clientY - this.dragStartY;
+                        
+                        // 更新块位置
+                        this.programBlocks[this.currentDraggingBlockIndex].x = this.blockStartX + deltaX;
+                        this.programBlocks[this.currentDraggingBlockIndex].y = this.blockStartY + deltaY;
+                        
+                        // 确保块不超出边界
+                        const block = this.programBlocks[this.currentDraggingBlockIndex];
+                        block.x = Math.max(0, block.x);
+                        block.y = Math.max(0, block.y);
+                    }
+                },
+                
+                // 全局鼠标释放
+                handleGlobalMouseUp() {
+                    this.isDraggingBlock = false;
+                    this.currentDraggingBlockIndex = -1;
+                },
+                
+                // 参数拖拽悬停
+                handleParamDragOver(event, paramName) {
+                    event.preventDefault();
+                    this.draggedOverParam = paramName;
+                },
+                
+                // 参数拖拽离开
+                handleParamDragLeave() {
+                    this.draggedOverParam = '';
+                },
+                
+                // 参数放置
+                handleParamDrop(event, blockIndex, paramName) {
+                    event.preventDefault();
+                    this.draggedOverParam = '';
+                    
+                    // 如果拖拽的是变量，将变量名设置到参数值
+                    if (this.dragItemType === 'variable' && this.currentDragItem) {
+                        const block = this.programBlocks[blockIndex];
+                        const param = block.params.find(p => p.name === paramName);
+                        if (param) {
+                            param.value = this.currentDragItem.name;
+                        }
+                    }
+                },
+                
+                // 创建变量
+                createVariable() {
+                    if (!this.newVar.name.trim()) {
+                        alert('请输入变量名称');
+                        return;
+                    }
+                    
+                    // 检查变量名是否已存在
+                    const exists = this.localVariables.some(v => v.name === this.newVar.name);
+                    if (exists) {
+                        alert('变量名已存在');
+                        return;
+                    }
+                    
+                    // 添加新变量
+                    const newVar = {
+                        name: this.newVar.name,
+                        type: this.newVar.type,
+                        value: this.newVar.value || (this.newVar.type === 'bool' ? 'false' : '0'),
+                        description: this.newVar.description
+                    };
+                    
+                    this.localVariables.push(newVar);
+                    
+                    // 重置表单
+                    this.newVar = {
+                        name: '',
+                        type: 'int',
+                        value: '',
+                        description: ''
+                    };
+                    
+                    // 关闭模态框
+                    this.showCreateVarModal = false;
+                },
+                
+                // 显示提示框
+                showTooltip(event, text) {
+                    this.tooltipText = text;
+                    this.tooltipX = event.clientX + 10;
+                    this.tooltipY = event.clientY - 30;
+                    this.tooltipVisible = true;
+                },
+                
+                // 隐藏提示框
+                hideTooltip() {
+                    this.tooltipVisible = false;
+                }
+            }
+        });
+    </script>
+</body>
+</html>
