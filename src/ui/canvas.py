@@ -19,6 +19,7 @@ class ProgrammingCanvas(QWidget):
     blockSelected = pyqtSignal(int)
     connectionCreated = pyqtSignal(Connection)
     variableUpdated = pyqtSignal(str, str)  # 变量名和变量类型
+    block_connected = pyqtSignal(str, str)  # 第一个参数是源块ID，第二个是目标块ID
     
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -326,74 +327,99 @@ class ProgrammingCanvas(QWidget):
         return None, None
     
     def connectNodes(self, from_node, to_node, from_block_idx, to_block_idx):
-        """连接两个节点，支持逻辑分支与函数间执行流连接"""
-        print(f"尝试连接节点: 源块={from_block_idx}, 源节点={from_node.name}, 目标块={to_block_idx}, 目标节点={to_node.name}")
-        
-        # 重要检查：不允许将output连接到另一个output
-        if from_node.node_type == NodeType.OUTPUT and to_node.node_type == NodeType.OUTPUT:
-            print("连接失败: 不允许将输出节点连接到另一个输出节点")
-            return False
-        
-        # 支持两种类型的连接：
-        # 1. 执行流连接：控制执行顺序（value_type为"execution"）
-        # 2. 数据流连接：传递数据值（其他类型）
-        
-        # 检查连接类型匹配规则
-        connection_valid = False
-        connection_type = 'data'  # 默认是数据流连接
-        
-        # 执行流连接规则：execution类型节点可以连接到任何其他execution类型节点
-        if from_node.value_type == "execution" and to_node.value_type == "execution":
-            connection_valid = True
-            connection_type = 'execution'
-        # 数据流连接规则：数据类型必须匹配，或者源节点为变量/常量节点
-        elif from_node.value_type == to_node.value_type:
-            connection_valid = True
-        # 特殊处理：布尔值节点也可以连接到布尔类型的条件输入
-        elif ((from_node.value_type == "bool" and to_node.value_type == "boolean") or
-              (from_node.value_type == "boolean" and to_node.value_type == "bool")):
-            connection_valid = True
-        # 特殊处理：变量节点可以连接到任何参数节点
-        elif hasattr(from_node, 'variable'):
-            # 变量节点可以连接到任何类型的参数节点
-            connection_valid = True
-        
-        if not connection_valid:
-            print(f"连接失败: 节点类型不匹配 {from_node.value_type} -> {to_node.value_type}")
-            return False
-        
-        # 删除目标节点的旧连接（支持变量替换功能）
-        for conn in self.connections[:]:
-            if conn.to_node == to_node and conn.to_block == to_block_idx:
+        """连接两个节点，支持逻辑分支与函数间执行流连接，增强版"""
+        try:
+            print(f"尝试连接节点: 源块={from_block_idx}, 源节点={from_node.name}, 目标块={to_block_idx}, 目标节点={to_node.name}")
+            
+            # 重要检查：不允许将output连接到另一个output
+            if from_node.node_type == NodeType.OUTPUT and to_node.node_type == NodeType.OUTPUT:
+                print("连接失败: 不允许将输出节点连接到另一个输出节点")
+                return False
+            
+            # 检查源块和目标块索引有效性
+            if from_block_idx < -1 or from_block_idx >= len(self.blocks):
+                print(f"错误: 源程序块索引无效: {from_block_idx}")
+                return False
+                
+            if to_block_idx < -1 or to_block_idx >= len(self.blocks):
+                print(f"错误: 目标程序块索引无效: {to_block_idx}")
+                return False
+            
+            # 支持两种类型的连接：
+            # 1. 执行流连接：控制执行顺序（value_type为"execution"）
+            # 2. 数据流连接：传递数据值（其他类型）
+            
+            # 检查连接类型匹配规则
+            connection_valid = False
+            connection_type = 'data'  # 默认是数据流连接
+            
+            # 执行流连接规则：execution类型节点可以连接到任何其他execution类型节点
+            if from_node.value_type == "execution" and to_node.value_type == "execution":
+                connection_valid = True
+                connection_type = 'execution'
+            # 数据流连接规则：数据类型必须匹配，或者源节点为变量/常量节点
+            elif from_node.value_type == to_node.value_type:
+                connection_valid = True
+            # 特殊处理：布尔值节点也可以连接到布尔类型的条件输入
+            elif ((from_node.value_type == "bool" and to_node.value_type == "boolean") or
+                  (from_node.value_type == "boolean" and to_node.value_type == "bool")):
+                connection_valid = True
+            # 特殊处理：变量节点可以连接到任何参数节点
+            elif hasattr(from_node, 'variable'):
+                # 变量节点可以连接到任何类型的参数节点
+                connection_valid = True
+            
+            if not connection_valid:
+                print(f"连接失败: 节点类型不匹配 {from_node.value_type} -> {to_node.value_type}")
+                return False
+            
+            # 查找并删除目标节点的旧连接（支持变量替换功能）
+            # 使用列表推导式找到需要删除的连接
+            old_connections = [conn for conn in self.connections 
+                              if conn.to_node == to_node and conn.to_block == to_block_idx]
+            
+            for conn in old_connections:
                 print(f"清除目标节点的旧连接: {conn.from_node.name}")
                 self.connections.remove(conn)
-        
-        # 检查是否已经存在相同的连接
-        for conn in self.connections:
-            if (conn.from_node == from_node and conn.to_node == to_node and
-                conn.from_block == from_block_idx and conn.to_block == to_block_idx):
+            
+            # 检查是否已经存在相同的连接
+            existing_connection = next(
+                (conn for conn in self.connections 
+                 if conn.from_node == from_node and conn.to_node == to_node and
+                    conn.from_block == from_block_idx and conn.to_block == to_block_idx), 
+                None
+            )
+            
+            if existing_connection:
                 print("连接失败: 连接已存在")
                 return False
-        
-        # 创建新连接
-        new_connection = Connection(
-            from_block=from_block_idx,
-            from_node=from_node,
-            to_block=to_block_idx,
-            to_node=to_node
-        )
-        # 添加连接类型属性
-        new_connection.type = connection_type
-        self.connections.append(new_connection)
-        
-        # 输出连接创建信息
-        if connection_type == 'execution':
-            print(f"执行流连接创建成功: 从块 {from_block_idx} 的节点 {from_node.node_id} 到块 {to_block_idx} 的节点 {to_node.node_id}")
-        else:
-            print(f"数据流连接创建成功: 从块 {from_block_idx} 的节点 {from_node.node_id} 到块 {to_block_idx} 的节点 {to_node.node_id}")
-        
-        self.update()
-        return True
+            
+            # 创建新连接
+            new_connection = Connection(
+                from_block=from_block_idx,
+                from_node=from_node,
+                to_block=to_block_idx,
+                to_node=to_node
+            )
+            # 添加连接类型属性
+            new_connection.type = connection_type
+            self.connections.append(new_connection)
+            
+            # 输出连接创建信息
+            if connection_type == 'execution':
+                print(f"执行流连接创建成功: 从块 {from_block_idx} 的节点 {from_node.node_id} 到块 {to_block_idx} 的节点 {to_node.node_id}")
+            else:
+                print(f"数据流连接创建成功: 从块 {from_block_idx} 的节点 {from_node.node_id} 到块 {to_block_idx} 的节点 {to_node.node_id}")
+            
+            # 发送连接创建信号
+            self.connectionCreated.emit(new_connection)
+            
+            self.update()
+            return True
+            
+        except Exception as e:
+            print(f"连接节点时发生错误: {str(e)}")
+            return False
     
     def mousePressEvent(self, event):
         """鼠标按下事件"""

@@ -135,16 +135,74 @@ class ProgramBlock:
 
 
 class Connection:
-    """程序块连接类"""
-    def __init__(self, from_block: int, from_node: Node, to_block: int, to_node: Node):
-        self.from_block = from_block
-        self.from_node = from_node
-        self.to_block = to_block
-        self.to_node = to_node
+    def __init__(self, from_block=None, from_node=None, to_block=None, to_node=None,
+                 source_block=None, source_node=None, target_block=None, target_node=None,
+                 source_node_type=None, target_node_type=None):
+        # 支持旧版和新版的参数命名
+        self.from_block = from_block if from_block is not None else source_block
+        self.from_node = from_node if from_node is not None else source_node
+        self.to_block = to_block if to_block is not None else target_block
+        self.to_node = to_node if to_node is not None else target_node
         
-        # 建立双向连接
-        from_node.connection = to_node
-        to_node.connection = from_node
+        # 为了向后兼容保留旧属性
+        self.source_block = self.from_block
+        self.source_node = self.from_node
+        self.target_block = self.to_block
+        self.target_node = self.to_node
+        
+        self.source_node_type = source_node_type
+        self.target_node_type = target_node_type
+        self.type = 'data'  # 默认类型
+        
+        # 建立双向连接 - 只有当节点是对象时才建立连接（不是字符串ID）
+        if from_node is not None and to_node is not None and isinstance(from_node, Node) and isinstance(to_node, Node):
+            from_node.connection = to_node
+            to_node.connection = from_node
+        elif source_node is not None and target_node is not None and isinstance(source_node, Node) and isinstance(target_node, Node):
+            source_node.connection = target_node
+            target_node.connection = source_node
+    
+    def to_dict(self):
+        return {
+            'source_block': self.source_block,
+            'source_node': self.source_node,
+            'target_block': self.target_block,
+            'target_node': self.target_node,
+            'source_node_type': self.source_node_type.value if self.source_node_type else None,
+            'target_node_type': self.target_node_type.value if self.target_node_type else None,
+            'type': self.type
+        }
+    
+    @classmethod
+    def from_dict(cls, data):
+        # 确保所有必要的键都存在
+        required_keys = ['source_block', 'source_node', 'target_block', 'target_node']
+        for key in required_keys:
+            if key not in data:
+                raise KeyError(f"缺少必要的键: {key}")
+        
+        # 转换节点类型
+        source_node_type = NodeType(data['source_node_type']) if data.get('source_node_type') else None
+        target_node_type = NodeType(data['target_node_type']) if data.get('target_node_type') else None
+        
+        connection = cls(
+            source_block=data['source_block'],
+            source_node=data['source_node'],
+            target_block=data['target_block'],
+            target_node=data['target_node'],
+            source_node_type=source_node_type,
+            target_node_type=target_node_type
+        )
+        
+        # 设置连接类型
+        if 'type' in data:
+            connection.type = data['type']
+            
+        return connection
+    
+    def __str__(self):
+        return (f"Connection(from_block={self.from_block}, from_node={self.from_node}, "
+                f"to_block={self.to_block}, to_node={self.to_node}, type={self.type})")
 
 
 class Variable:
