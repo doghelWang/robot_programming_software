@@ -331,10 +331,17 @@ class ProgrammingCanvas(QWidget):
         try:
             print(f"尝试连接节点: 源块={from_block_idx}, 源节点={from_node.name}, 目标块={to_block_idx}, 目标节点={to_node.name}")
             
-            # 重要检查：不允许将output连接到另一个output
-            if from_node.node_type == NodeType.OUTPUT and to_node.node_type == NodeType.OUTPUT:
+            # 重要检查：不允许将output连接到另一个output（但允许变量赋值连接）
+            # 特别处理：如果连接的是变量赋值场景，允许输出到输入的连接
+            is_variable_assignment = (hasattr(from_node, 'variable') or hasattr(to_node, 'variable')) and from_node.node_type == NodeType.OUTPUT and to_node.node_type == NodeType.INPUT
+            if (from_node.node_type == NodeType.OUTPUT and to_node.node_type == NodeType.OUTPUT and
+                not (hasattr(from_node, 'variable') or hasattr(to_node, 'variable') or is_variable_assignment)):
                 print("连接失败: 不允许将输出节点连接到另一个输出节点")
-                return False
+                # 但是，如果这是变量赋值场景，允许连接
+                if is_variable_assignment:
+                    print("允许变量赋值连接")
+                else:
+                    return False
             
             # 检查源块和目标块索引有效性
             if from_block_idx < -1 or from_block_idx >= len(self.blocks):
@@ -606,6 +613,38 @@ class ProgrammingCanvas(QWidget):
                     print(f"变量 {item_data['name']} 已连接到节点 {target_node.name}")
                     return
                 
+                # 处理从变量拖拽到函数参数的情况（补充完善）
+                if item_type == 'variable' and target_node and target_node.node_type == NodeType.INPUT and target_node.value_type != 'execution':
+                    print(f"将变量连接到输入节点: {item_data['name']} -> {target_node.name}")
+                    # 创建一个虚拟的变量输出节点用于连接
+                    from_variable_node = Node(
+                        name=f'var_{item_data["name"]}',
+                        node_type=NodeType.OUTPUT,
+                        value_type=item_data.get('type', 'unknown'),
+                        node_id=f'var_{item_data["name"]}_output'
+                    )
+                    from_variable_node.variable = item_data['name']  # 标记为变量节点
+                    
+                    # 清除目标节点的旧连接
+                    old_connections = [conn for conn in self.connections 
+                                      if conn.to_node == target_node and conn.to_block == target_block_index]
+                    for conn in old_connections:
+                        print(f"清除目标节点的旧连接: {conn.from_node.name}")
+                        self.connections.remove(conn)
+                    
+                    # 创建新连接
+                    new_connection = Connection(
+                        from_block=-1,  # 特殊标记，表示来自变量
+                        from_node=from_variable_node,
+                        to_block=target_block_index,
+                        to_node=target_node
+                    )
+                    new_connection.type = 'data'
+                    self.connections.append(new_connection)
+                    self.update()
+                    print(f"变量 {item_data['name']} 已连接到节点 {target_node.name}")
+                    return
+                
                 if item_type == 'function':
                     # 创建新的程序块
                     pos = event.position()
@@ -750,6 +789,70 @@ class ProgrammingCanvas(QWidget):
                     self.variableUpdated.emit(item_data['name'], from_node.value_type)
                     self.update()
                     print(f"函数输出已连接到变量: {from_node.name} -> {item_data['name']}")
+                    return
+                
+                # 处理从变量拖拽到函数参数的情况（补充完善）
+                if item_type == 'variable' and target_node and target_node.node_type == NodeType.INPUT and target_node.value_type != 'execution':
+                    print(f"将变量连接到输入节点: {item_data['name']} -> {target_node.name}")
+                    # 创建一个虚拟的变量输出节点用于连接
+                    from_variable_node = Node(
+                        name=f'var_{item_data["name"]}',
+                        node_type=NodeType.OUTPUT,
+                        value_type=item_data.get('type', 'unknown'),
+                        node_id=f'var_{item_data["name"]}_output'
+                    )
+                    from_variable_node.variable = item_data['name']  # 标记为变量节点
+                    
+                    # 清除目标节点的旧连接
+                    old_connections = [conn for conn in self.connections 
+                                      if conn.to_node == target_node and conn.to_block == target_block_index]
+                    for conn in old_connections:
+                        print(f"清除目标节点的旧连接: {conn.from_node.name}")
+                        self.connections.remove(conn)
+                    
+                    # 创建新连接
+                    new_connection = Connection(
+                        from_block=-1,  # 特殊标记，表示来自变量
+                        from_node=from_variable_node,
+                        to_block=target_block_index,
+                        to_node=target_node
+                    )
+                    new_connection.type = 'data'
+                    self.connections.append(new_connection)
+                    self.update()
+                    print(f"变量 {item_data['name']} 已连接到节点 {target_node.name}")
+                    return
+                
+                # 处理从变量拖拽到函数参数的情况
+                if item_type == 'variable' and target_node and target_node.node_type == NodeType.INPUT and target_node.value_type != 'execution':
+                    print(f"将变量连接到输入节点: {item_data['name']} -> {target_node.name}")
+                    # 创建一个虚拟的变量输出节点用于连接
+                    from_variable_node = Node(
+                        name=f'var_{item_data["name"]}',
+                        node_type=NodeType.OUTPUT,
+                        value_type=item_data.get('type', 'unknown'),
+                        node_id=f'var_{item_data["name"]}_output'
+                    )
+                    from_variable_node.variable = item_data['name']  # 标记为变量节点
+                    
+                    # 清除目标节点的旧连接
+                    old_connections = [conn for conn in self.connections 
+                                      if conn.to_node == target_node and conn.to_block == target_block_index]
+                    for conn in old_connections:
+                        print(f"清除目标节点的旧连接: {conn.from_node.name}")
+                        self.connections.remove(conn)
+                    
+                    # 创建新连接
+                    new_connection = Connection(
+                        from_block=-1,  # 特殊标记，表示来自变量
+                        from_node=from_variable_node,
+                        to_block=target_block_index,
+                        to_node=target_node
+                    )
+                    new_connection.type = 'data'
+                    self.connections.append(new_connection)
+                    self.update()
+                    print(f"变量 {item_data['name']} 已连接到节点 {target_node.name}")
                     return
                 
             except json.JSONDecodeError:

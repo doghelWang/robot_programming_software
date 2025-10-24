@@ -1,0 +1,70 @@
+{
+  "基本信息": {
+    "name": "202905478",
+    "desc": "",
+    "type": "202905478",
+    "ver": "V1.0.0",
+    "id_dip": "ID_DIP_NULL",
+    "ce_mode_set": 0,
+    "di_hd_mode_set": 0,
+    "board_type": [
+      "BOARD_SAFE_CTRL_MASTER_H8"
+    ],
+    "mcu": [
+      {
+        "chip": "R110"
+      }
+    ]
+  },
+  "通信接口": {
+    "can": [
+      {
+        "name": "CAN_1",
+        "protocol": "PROTOCOL_UCAN",
+        "ucan_id": [
+          {
+            "mcu": 0,
+            "peripheral": "hcan1",
+            "id_map": [
+              66
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "io接口": {
+    "di": [
+      {
+        "name": "DI_1",
+        "desc": "warning1",
+        "mcu": 0,
+        "group": "GPB",
+        "pin": 14,
+        "io_mode": 0,
+        "freq": 0,
+        "pull_mode": 0,
+        "open_circle_level": 1,
+        "hd_if_mode": ""
+      },
+      {
+        "name": "DI_2",
+        "desc": "warning2",
+        "mcu": 0,
+        "group": "GPB",
+        "pin": 15,
+        "io_mode": 0,
+        "freq": 0,
+        "pull_mode": 0,
+        "open_circle_level": 1,
+        "hd_if_mode": ""
+      }
+    ],
+    "do": [],
+    "ai": []
+  },
+  "功能接口": {
+    "pztb": [],
+    "encr": []
+  }
+}

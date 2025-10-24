@@ -1,0 +1,31 @@
+{
+  "基本信息": {
+    "name": "202905477",
+    "desc": "",
+    "type": "202905477",
+    "ver": "V1.0.0",
+    "id_dip": "ID_DIP_NULL",
+    "ce_mode_set": 0,
+    "di_hd_mode_set": 0,
+    "board_type": [
+      "BOARD_SAFE_CTRL_MASTER_H8"
+    ],
+    "mcu": [
+      {
+        "chip": "R110"
+      }
+    ]
+  },
+  "通信接口": {
+    "can": []
+  },
+  "io接口": {
+    "di": [],
+    "do": [],
+    "ai": []
+  },
+  "功能接口": {
+    "pztb": [],
+    "encr": []
+  }
+}

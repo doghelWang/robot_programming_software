@@ -39,7 +39,7 @@ class VariableDisplayWidget(QWidget):
         name_label.setStyleSheet("font-weight: bold; font-size: 14px;")
         
         # 变量值和类型信息
-        var_type = getattr(variable, 'var_type', getattr(variable, 'type', 'unknown'))
+        var_type = getattr(variable, 'type', getattr(variable, 'var_type', 'unknown'))
         value = getattr(variable, 'value', None)
         value_text = f"值: {value}"
         type_text = f"类型: {var_type}"

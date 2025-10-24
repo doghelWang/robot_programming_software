@@ -1,0 +1,275 @@
+{
+  "基本信息": {
+    "name": "202904511",
+    "desc": "",
+    "type": "202904511",
+    "ver": "V1.0.0",
+    "id_dip": "ID_DIP_NULL",
+    "ce_mode_set": 0,
+    "di_hd_mode_set": 0,
+    "board_type": [
+      "BOARD_SAFE_CTRL_MASTER_H8"
+    ],
+    "mcu": [
+      {
+        "chip": "R110"
+      }
+    ]
+  },
+  "通信接口": {
+    "can": [
+      {
+        "name": "CAN_1",
+        "protocol": "PROTOCOL_CANOPEN",
+        "ucan_id": [
+          {
+            "mcu": 0,
+            "peripheral": "hcan1",
+            "id_map": [
+              66
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "io接口": {
+    "di": [
+      {
+        "name": "DI_1",
+        "desc": "光电信号输入IO1 (IN，光电版本可用)",
+        "mcu": 0,
+        "group": "GPD",
+        "pin": 2,
+        "io_mode": 0,
+        "freq": 0,
+        "pull_mode": 0,
+        "open_circle_level": 1,
+        "hd_if_mode": ""
+      },
+      {
+        "name": "DI_2",
+        "desc": "光电信号输入IO2 (IN，光电版本可用)",
+        "mcu": 0,
+        "group": "GPB",
+        "pin": 3,
+        "io_mode": 0,
+        "freq": 0,
+        "pull_mode": 0,
+        "open_circle_level": 1,
+        "hd_if_mode": ""
+      },
+      {
+        "name": "DI_3",
+        "desc": "光电信号输入IO3 (IN，光电版本可用)",
+        "mcu": 0,
+        "group": "GPB",
+        "pin": 4,
+        "io_mode": 0,
+        "freq": 0,
+        "pull_mode": 0,
+        "open_circle_level": 1,
+        "hd_if_mode": ""
+      },
+      {
+        "name": "DI_4",
+        "desc": "光电信号输入IO4 (IN，光电版本可用)",
+        "mcu": 0,
+        "group": "GPB",
+        "pin": 5,
+        "io_mode": 0,
+        "freq": 0,
+        "pull_mode": 0,
+        "open_circle_level": 1,
+        "hd_if_mode": ""
+      }
+    ],
+    "do": [
+      {
+        "name": "DO_1",
+        "desc": "板内24V供电使能：默认使能 (OUT)",
+        "mcu": 0,
+        "group": "GPC",
+        "pin": 0,
+        "io_mode": 1,
+        "freq": 0,
+        "pull_mode": 0,
+        "enable_level": 1
+      },
+      {
+        "name": "DO_2",
+        "desc": "镭射灯24V (OUT)",
+        "mcu": 0,
+        "group": "GPB",
+        "pin": 14,
+        "io_mode": 1,
+        "freq": 0,
+        "pull_mode": 0,
+        "enable_level": 1
+      },
+      {
+        "name": "DO_3",
+        "desc": "485_24V (OUT)",
+        "mcu": 0,
+        "group": "GPC",
+        "pin": 7,
+        "io_mode": 1,
+        "freq": 0,
+        "pull_mode": 0,
+        "enable_level": 1
+      },
+      {
+        "name": "DO_4",
+        "desc": "预留CAN接口电源1,默认使能 (OUT)",
+        "mcu": 0,
+        "group": "GPC",
+        "pin": 6,
+        "io_mode": 1,
+        "freq": 0,
+        "pull_mode": 0,
+        "enable_level": 1
+      },
+      {
+        "name": "DO_5",
+        "desc": "左侧灯带，绿灯使能 (OUT)",
+        "mcu": 0,
+        "group": "GPC",
+        "pin": 1,
+        "io_mode": 1,
+        "freq": 0,
+        "pull_mode": 0,
+        "enable_level": 1
+      },
+      {
+        "name": "DO_6",
+        "desc": "左侧灯带，红灯使能 (OUT)",
+        "mcu": 0,
+        "group": "GPC",
+        "pin": 2,
+        "io_mode": 1,
+        "freq": 0,
+        "pull_mode": 0,
+        "enable_level": 1
+      },
+      {
+        "name": "DO_7",
+        "desc": "左侧灯带，黄灯使能 (OUT)",
+        "mcu": 0,
+        "group": "GPC",
+        "pin": 3,
+        "io_mode": 1,
+        "freq": 0,
+        "pull_mode": 0,
+        "enable_level": 1
+      },
+      {
+        "name": "DO_8",
+        "desc": "右侧灯带，绿灯使能 (OUT)",
+        "mcu": 0,
+        "group": "GPA",
+        "pin": 9,
+        "io_mode": 1,
+        "freq": 0,
+        "pull_mode": 0,
+        "enable_level": 1
+      },
+      {
+        "name": "DO_9",
+        "desc": "右侧灯带，红灯使能 (OUT)",
+        "mcu": 0,
+        "group": "GPA",
+        "pin": 8,
+        "io_mode": 1,
+        "freq": 0,
+        "pull_mode": 0,
+        "enable_level": 1
+      },
+      {
+        "name": "DO_10",
+        "desc": "右侧灯带，黄灯使能 (OUT)",
+        "mcu": 0,
+        "group": "GPA",
+        "pin": 10,
+        "io_mode": 1,
+        "freq": 0,
+        "pull_mode": 0,
+        "enable_level": 1
+      },
+      {
+        "name": "DO_11",
+        "desc": "光电电源24V & TOF电源5V，默认使能 (OUT)",
+        "mcu": 0,
+        "group": "GPB",
+        "pin": 12,
+        "io_mode": 1,
+        "freq": 0,
+        "pull_mode": 0,
+        "enable_level": 1
+      },
+      {
+        "name": "DO_12",
+        "desc": "TOF串口1 (OUT,TOF版本可用)",
+        "mcu": 0,
+        "group": "GPA",
+        "pin": 2,
+        "io_mode": 1,
+        "freq": 0,
+        "pull_mode": 0,
+        "enable_level": 1
+      },
+      {
+        "name": "DO_13",
+        "desc": "TOF串口2 (OUT,TOF版本可用)",
+        "mcu": 0,
+        "group": "GPB",
+        "pin": 10,
+        "io_mode": 1,
+        "freq": 0,
+        "pull_mode": 0,
+        "enable_level": 1
+      }
+    ],
+    "ai": [
+      {
+        "name": "AI_1",
+        "desc": "气动采样2 (ADC-IN)",
+        "mcu": 0,
+        "group": "GPA",
+        "pin": 0,
+        "io_mode": 0,
+        "freq": 0,
+        "pull_mode": 0,
+        "adc_mode": 0,
+        "adc_ch": 0
+      },
+      {
+        "name": "AI_2",
+        "desc": "气动采样1 (ADC-IN)",
+        "mcu": 0,
+        "group": "GPA",
+        "pin": 1,
+        "io_mode": 0,
+        "freq": 0,
+        "pull_mode": 0,
+        "adc_mode": 0,
+        "adc_ch": 0
+      },
+      {
+        "name": "AI_3",
+        "desc": "外部压电式碰撞条输入采样 (ADC-IN)",
+        "mcu": 0,
+        "group": "GPA",
+        "pin": 4,
+        "io_mode": 0,
+        "freq": 0,
+        "pull_mode": 0,
+        "adc_mode": 0,
+        "adc_ch": 0
+      }
+    ]
+  },
+  "功能接口": {
+    "pztb": [],
+    "encr": []
+  }
+}

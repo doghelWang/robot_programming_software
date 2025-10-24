@@ -1,0 +1,45 @@
+{
+  "基本信息": {
+    "name": "202903931",
+    "desc": "",
+    "type": "202903931",
+    "ver": "V1.0.0",
+    "id_dip": "ID_DIP_NULL",
+    "ce_mode_set": 0,
+    "di_hd_mode_set": 0,
+    "board_type": [
+      "BOARD_SAFE_CTRL_MASTER_H8"
+    ],
+    "mcu": [
+      {
+        "chip": "R110"
+      }
+    ]
+  },
+  "通信接口": {
+    "can": [
+      {
+        "name": "CAN_1",
+        "protocol": "PROTOCOL_UCAN",
+        "ucan_id": [
+          {
+            "mcu": 0,
+            "peripheral": "hcan1",
+            "id_map": [
+              66
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "io接口": {
+    "di": [],
+    "do": [],
+    "ai": []
+  },
+  "功能接口": {
+    "pztb": [],
+    "encr": []
+  }
+}
